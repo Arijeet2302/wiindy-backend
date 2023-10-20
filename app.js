@@ -6,7 +6,7 @@ const cors = require('cors');
 const port = 5000;
 const fav = require('./favorites');
 
-app.use('./api/user',cors());
+app.use('/api/user',cors());
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URL, {
