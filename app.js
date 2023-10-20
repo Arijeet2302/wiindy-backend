@@ -6,14 +6,7 @@ const cors = require('cors');
 const port = 5000;
 const fav = require('./favorites');
 
-const corsOptions = {
-  origin: 'https://wiindy.vercel.app',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-};
-
-app.use(cors(corsOptions));
+app.use('./api/user',cors());
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URL, {
