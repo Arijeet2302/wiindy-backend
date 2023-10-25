@@ -3,17 +3,9 @@ const express = require('express')
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
-const port = 5000;
 const fav = require('./favorites');
 
-app.use('/api/user',cors());
-app.use('/app/user',(req,res)=>{
-  res.set({
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "*",
-    "Access-Control-Allow-Headers": "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'",
-});
-})
+app.use(cors());
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URL, {
@@ -33,6 +25,4 @@ mongoose.connect(process.env.MONGO_URL, {
 
 app.use('/api/user', fav);
 
-app.listen(port, () => {
-  console.log(`App listening on port ${port}`)
-})
+module.exports = app;
