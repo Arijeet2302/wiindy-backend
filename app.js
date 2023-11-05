@@ -5,8 +5,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const fav = require('./favorites');
 
+const ReqOrigins = ['https://wiindy-ui.vercel.app','http://localhost:5173/']
+
 app.use(cors({
-  origin: 'https://wiindy.vercel.app', // Replace with the actual URL of your React app
+  origin: ReqOrigins, 
   methods: 'GET,POST,PUT,DELETE',
   credentials: true,
 }));
