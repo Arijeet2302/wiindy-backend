@@ -5,13 +5,14 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const fav = require('./favorites');
 
-const ReqOrigins = ['https://wiindy-ui.vercel.app','http://localhost:5173/']
+// const ReqOrigins = ['https://wiindy-ui.vercel.app','http://localhost:5173/']
 
-app.use(cors({
-  origin: ReqOrigins, 
-  methods: 'GET,POST,PUT,DELETE',
-  credentials: true,
-}));
+// app.use(cors({
+//   origin: ReqOrigins, 
+//   methods: 'GET,POST,PUT,DELETE',
+//   credentials: true,
+// }));
+app.use(cors());
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URL, {
