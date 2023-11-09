@@ -12,10 +12,10 @@ addToFav = async(req, res) =>{
 
 deleteFromFav = async(req, res)=>{
     try{
-        const {username, cityname} = req.body;
+        const { uid, cityname} = req.body;
         const deletedDocument = await userFavs.findOneAndDelete(
             { $and : [
-                {username : { $eq : username}},
+                {uid : { $eq : uid}},
                 {cityname: { $eq : cityname}}
             ]}); 
         if (!deletedDocument) {
@@ -31,8 +31,8 @@ deleteFromFav = async(req, res)=>{
 
 showfavs = async(req,res)=>{
     try{
-        const {username } = req.body;
-        const documents = await userFavs.find({ username : { $eq : username}});
+        const { uid } = req.body;
+        const documents = await userFavs.find({ uid : { $eq : uid}});
         return res.send(documents); 
     }catch(err){
         console.error("Error retrieving favs", err);
