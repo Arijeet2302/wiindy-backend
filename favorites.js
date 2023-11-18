@@ -11,13 +11,9 @@ addToFav = async(req, res) =>{
 
 
 deleteFromFav = async(req, res)=>{
+    const item_id = req.param.id;
     try{
-        const { uid, cityname} = req.body;
-        const deletedDocument = await userFavs.findOneAndDelete(
-            { $and : [
-                {uid : { $eq : uid}},
-                {cityname: { $eq : cityname}}
-            ]}); 
+        const deletedDocument = await userFavs.findByIdAndRemove(item_id); 
         if (!deletedDocument) {
             return res.status(404).json({ message: 'Document not found' });
           }
@@ -40,6 +36,6 @@ showfavs = async(req,res)=>{
 }
 
 router.post("/add", addToFav);
-router.delete("/delete", deleteFromFav);
+router.delete("/delete/:id", deleteFromFav);
 router.post("/favorites", showfavs);
 module.exports = router;
