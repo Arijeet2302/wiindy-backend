@@ -11,7 +11,7 @@ addToFav = async(req, res) =>{
 
 
 deleteFromFav = async(req, res)=>{
-    const item_id = req.param.id;
+    const item_id = req.params.id;
     try{
         const deletedDocument = await userFavs.findByIdAndRemove(item_id); 
         if (!deletedDocument) {
