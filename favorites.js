@@ -37,5 +37,5 @@ showfavs = async(req,res)=>{
 
 router.post("/add", addToFav);
 router.delete("/delete/:id", deleteFromFav);
-router.post("/favorites", showfavs);
+router.get("/favorites", showfavs);
 module.exports = router;
