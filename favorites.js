@@ -27,7 +27,7 @@ deleteFromFav = async(req, res)=>{
 
 showfavs = async(req,res)=>{
     try{
-        const { uid } = req.body;
+        const uid = req.query.uid;
         const documents = await userFavs.find({ uid : { $eq : uid}});
         return res.send(documents); 
     }catch(err){
