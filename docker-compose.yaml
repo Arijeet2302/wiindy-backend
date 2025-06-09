@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  wiindy-backend:
+    build: .
+    container_name: wiindy-backend
+    ports:
+      - "3000:5000"
+    env_file:
+      - .env
+    # depends_on:
+    #   - wiindy-db
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
+
+#   wiindy-db:
+#     image: mongo:6
+#     container_name: wiindy-db
+#     ports:
+#       - "27017:27017"
+#     volumes:
+#       - wiindy-db-data:/data/db
+#     restart: always
+
+# volumes:
+#   wiindy-db-data:
