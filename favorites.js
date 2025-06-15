@@ -35,6 +35,7 @@ showfavs = async(req,res)=>{
     }
 }
 
+// Route definitions
 router.post("/add", addToFav);
 router.delete("/delete/:id", deleteFromFav);
 router.get("/favorites", showfavs);
