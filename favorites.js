@@ -35,8 +35,21 @@ showfavs = async(req,res)=>{
     }
 }
 
+showAllFavs = async(req, res) => {
+    try {
+        const documents = await userFavs.find({});
+        return res.send(documents);
+    }catch (err) {
+        console.error("Error retrieving all favorites", err);
+        return res.status(500).send({ msg: "Internal server error" });
+    }
+}
+
 // Route definitions
 router.post("/add", addToFav);
 router.delete("/delete/:id", deleteFromFav);
 router.get("/favorites", showfavs);
+router.get("/all", showAllFavs);
+
+// Export the router
 module.exports = router;
