@@ -1,0 +1,50 @@
+name: Deploy to EC2 with Rollback
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v3
+
+    - name: 🔐 Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+    - name: 🚀 Deploy with Rollback
+      run: |
+        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          set -e
+
+          cd ${{ secrets.EC2_PROJECT_DIR }}
+
+          echo "📌 Saving current commit hash..."
+          PREV_COMMIT=\$(git rev-parse HEAD)
+
+          echo "📥 Pulling new code..."
+          if ! git pull origin main; then
+            echo "❌ Git pull failed. Keeping previous version."
+            exit 1
+          fi
+
+          echo "🧪 Trying to rebuild and restart server..."
+          if ! docker compose down && docker compose up --build -d; then
+            echo "❌ Deployment failed. Rolling back to previous commit: \$PREV_COMMIT"
+            git reset --hard \$PREV_COMMIT
+            docker compose down wiindy-backend
+            docker compose build wiindy-backend
+            docker compose up wiindy-backend
+            echo "✅ Rollback completed successfully."
+          else
+            echo "✅ New deployment succeeded."
+          fi
+        EOF
