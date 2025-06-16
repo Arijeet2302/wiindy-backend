@@ -16,7 +16,7 @@ jobs:
     - name: Set up SSH from base64 key
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\n' | base64 -d > ~/.ssh/id_rsa || { echo "Failed to decode SSH key"; exit 1; }
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa        
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
