@@ -1,0 +1,32 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing tools..."
+      - apt-get update && apt-get install -y openssh-client
+      - echo "$SSH_KEY" > key.pem && chmod 600 key.pem
+
+  pre_build:
+    commands:
+      - echo "Saving current commit hash..."
+      - export PREV_COMMIT=$(git rev-parse HEAD)
+
+  build:
+    commands:
+      - echo "Pulling latest code..."
+      - ssh -o StrictHostKeyChecking=no -i key.pem $EC2_USER@$EC2_HOST "
+          cd $EC2_APP_DIR &&
+          git pull origin main ||
+          (echo 'Pull failed, rolling back...' && git reset --hard $PREV_COMMIT)
+        "
+      - echo "Building and restarting Docker app..."
+      - ssh -i key.pem $EC2_USER@$EC2_HOST "
+          cd $EC2_APP_DIR &&
+          docker compose down &&
+          docker compose up --build -d
+        "
+
+artifacts:
+  files:
+    - '**/*'
