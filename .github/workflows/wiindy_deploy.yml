@@ -1,4 +1,4 @@
-name: Deploy to EC2 with Rollback
+name: Trigger AWS CodePipeline
 
 on:
   push:
@@ -6,49 +6,16 @@ on:
       - main
 
 jobs:
-  deploy:
+  trigger:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+    - name: 🔐 Configure AWS CLI
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-south-1
 
-    - name: Set up SSH from base64 key
+    - name: 🚀 Start AWS CodePipeline
       run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa        
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-
-    - name: Test SSH Connection
-      run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo SSH connection successful"
-
-    - name: Deploy with Rollback
-      run: |
-        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          set -e
-
-          cd ${{ secrets.EC2_PROJECT_DIR }}
-
-          echo "Saving current commit hash..."
-          PREV_COMMIT=$(git rev-parse HEAD)
-
-          echo "Pulling new code..."
-          if ! git pull origin main; then
-            echo "Git pull failed. Keeping previous version."
-            exit 1
-          fi
-
-          echo "Trying to rebuild and restart server..."
-          if ! docker compose down && docker compose up --build -d; then
-            echo "Deployment failed. Rolling back to previous commit: $PREV_COMMIT"
-            git reset --hard $PREV_COMMIT
-            docker compose down wiindy-backend
-            docker compose build wiindy-backend
-            docker compose up wiindy-backend
-            echo "Rollback completed successfully."
-          else
-            echo "New deployment succeeded."
-          fi
-        EOF
+        aws codepipeline start-pipeline-execution --name wiindy-backend-pipeline
